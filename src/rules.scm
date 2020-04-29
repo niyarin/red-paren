@@ -6,6 +6,10 @@
         `(((assv) (assv (quote ,symbol?) x) (assq (quote ,symbol?) x))
           ((assoc) (assoc (quote ,symbol?) x) (assq (quote ,symbol?) x))))
 
+      (define %eq-rules
+        `(((eqv?) (eqv? (quote ,symbol?) x) (eq? (quote ,symbol? x)))
+          ((equal?) (equal? (quote ,symbol?) x) (eq? (quote ,symbol? x)))))
+
       (define %control-rules
         `(((if) (if test true-expression) (when test true-expression))
           ((when not) (when (not test) expressions ...)
@@ -14,10 +18,11 @@
       (define %arithmetic-rules
         `(((=) (= x 0) (zero? x))
           ((=) (= 0 x) (zero? x))
-          ((=) (zero? (modulo x 2)) (even? x))
-          ((=) (= (modulo x 2) 1) (odd? x))
-          ((=) (not (zero? (modulo x 2))) (odd? x))
-          ((=) (> x 0) (positive? x))))
+          ((zero? modulo) (zero? (modulo x 2)) (even? x))
+          ((= modulo) (= (modulo x 2) 1) (odd? x))
+          ((not zero? modulo) (not (zero? (modulo x 2))) (odd? x))
+          ((>) (> x 0) (positive? x))
+          ((<) (< x 0) (negative? x))))
 
       (define %pair-rules
         `(((car) (car (car x)) (caar x))
@@ -34,7 +39,9 @@
                           "" (scheme list))
           ((filter lambda not ) (filter (lambda (x) (not (pred x)) body) ls)
                                 (remove pred ls)
-                                "" (scheme list))))
+                                "" (scheme list))
+          ((append reverse) (append (reverse rev-head) tail) (append-reverse rev-head tail)
+                            "" (scheme list))))
 
       (define red-paren/default-rules
         (append %assoc-rules
