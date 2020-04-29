@@ -13,13 +13,22 @@
              (cond
                ((null? rules) #f)
                ((rules+/match-expand (caar rules) (cadar rules) (caddar rules) input)
-                => (lambda (assert)
-                     assert))
+                => (lambda (suggestion)
+                     (let ((comment
+                             (if (null? (cdddar rules))
+                               "" (cadddr (car rules))))
+                           (target-library
+                             (if (or (null? (cdddar rules))
+                                     (null? (cddddr (car rules))))
+                               '() (cadr (cdddar rules)))))
+                       (list suggestion comment target-library))))
                (else
                  (loop (cdr rules))))))
 
-      (define (%assert from to)
-        (display "----------")(newline)(newline)
+      (define (%assert from to comment lib)
+        (display "----------")(newline)
+        (unless (null? lib) (display lib)(display " : "))
+        (display comment)(newline)(newline)
         (display "   ")(write from)(newline)
         (display "=> ")(write to)(newline)(newline))
 
@@ -30,14 +39,14 @@
           (else default)))
 
       (define (%lint1-loop code rules)
-         (let loop ((code code)
+         (let loop ((suggestion (list code))
                     (nest 0))
            (cond
-             ((= nest *limit-recursion) code)
-             ((%lint1 code rules)
-              => (lambda (suggested-code)
-                   (loop suggested-code (+ nest 1))))
-             ((> nest 0) code)
+             ((= nest *limit-recursion) suggestion)
+             ((%lint1 (car suggestion) rules)
+              => (lambda (_suggestion)
+                   (loop _suggestion (+ nest 1))))
+             ((> nest 0) suggestion)
              (else #f))))
 
       (define (%lint code rules execution-type res-box config)
@@ -46,10 +55,12 @@
                 ((not (list? code)))
                 ((eq? (car code) 'quote))
                 ((%lint1-loop code rules)
-                 => (lambda (suggested-code)
-                      (begin
+                 => (lambda (suggestion)
+                      (let ((suggested-code (car suggestion)))
                          (cond
-                           ((eq? execution-type 'command-line) (%assert code suggested-code))
+                           ((eq? execution-type 'command-line)
+                            (%assert code suggested-code
+                                     (cadr suggestion) (caddr suggestion)))
                            ((eq? execution-type 'program)
                             (set-car! res-box
                                       (cons `(,code ,suggested-code)
