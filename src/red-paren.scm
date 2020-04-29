@@ -6,6 +6,8 @@
            (niyarin rules+) (color-paren red-paren default-rules))
    (export red-paren/lint)
    (begin
+      (define *limit-recursion 10000)
+
       (define (%lint1 input rules)
         (let loop ((rules rules))
              (cond
@@ -27,12 +29,23 @@
            => cadr)
           (else default)))
 
+      (define (%lint1-loop code rules)
+         (let loop ((code code)
+                    (nest 0))
+           (cond
+             ((= nest *limit-recursion) code)
+             ((%lint1 code rules)
+              => (lambda (suggested-code)
+                   (loop suggested-code (+ nest 1))))
+             ((> nest 0) code)
+             (else #f))))
+
       (define (%lint code rules execution-type res-box config)
           (let loop ((code code))
               (cond
                 ((not (list? code)))
                 ((eq? (car code) 'quote))
-                ((%lint1 code rules)
+                ((%lint1-loop code rules)
                  => (lambda (suggested-code)
                       (begin
                          (cond
@@ -44,8 +57,7 @@
                            (else))
                          (for-each
                            (lambda (_code)
-                             (loop _code)
-                             suggested-code)
+                             (loop _code))
                            code))))
                 (else
                   (for-each
