@@ -31,7 +31,15 @@
           ((car cdr) (cdr (car x)) (cdar x))))
 
       (define %scheme-list-rules
-        `(((apply append map) (apply append (map f ls ...))
+        `(((cons lambda) (lambda (a b) (cons b a)) xcons "" (scheme list))
+          ((cons) (cons a (cons b c)) (cons* x y z) "" (scheme list))
+          ((values car cdr) (values (car x) (cdr x)) (car+cdr x) "" (scheme list))
+          ((list car cadr) (list (car x) (cadr x)) (take 2 x) "" (scheme list))
+          ((list car cadr caddr) (list (car x) (cadr x) (caddr x)) (take 3 x) "" (scheme list))
+          ((list car cadr caddr cadddr) (list (car x) (cadr x) (caddr x) (cadddr x)) (take 4 x) "" (scheme list))
+          ((filter map lambda) (filter (lambda (x) x) (map f ls ...)) (filter-map f ls ...) "" (scheme list))
+          ((apply map list) (apply map list ls ...) (zip ls ...) "" (scheme list))
+          ((apply append map) (apply append (map f ls ...))
                               (append-map f ls ...)
                               "" (scheme list))
           ((apply append) (apply append list-of-list)
@@ -43,9 +51,16 @@
           ((append reverse) (append (reverse rev-head) tail) (append-reverse rev-head tail)
                             "" (scheme list))))
 
+
+      (define %call/cc-rules
+        '(((call-with-current-continuation)
+           (call-with-current-continuation x)
+           (call/cc x))))
+
       (define red-paren/default-rules
         (append %assoc-rules
                 %control-rules
                 %arithmetic-rules
                 %pair-rules
-                %scheme-list-rules))))
+                %scheme-list-rules
+                %call/cc-rules))))
