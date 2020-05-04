@@ -33,6 +33,7 @@
       (define %scheme-list-rules
         `(((cons lambda) (lambda (a b) (cons b a)) xcons "" (scheme list))
           ((cons) (cons a (cons b c)) (cons* a b c) "" (scheme list))
+          ((cons cons*) (cons* x ... (cons b c)) (cons* x ... b c) "" (scheme list))
           ((values car cdr) (values (car x) (cdr x)) (car+cdr x) "" (scheme list))
           ((list car cadr) (list (car x) (cadr x)) (take 2 x) "" (scheme list))
           ((list car cadr caddr) (list (car x) (cadr x) (caddr x)) (take 3 x) "" (scheme list))
@@ -58,10 +59,17 @@
            (call-with-current-continuation x)
            (call/cc x))))
 
+      (define %order-rules
+        '(((read) (fn (read) (read))
+                  (let* ((arg1 (read)) (arg2 (read))) (fn arg1 arg2))
+                  "Execution order is unspecified(\"R7RS 4.1.3.  Procedure calls\")"
+                  '())))
+
       (define red-paren/default-rules
         (append %assoc-rules
                 %control-rules
                 %arithmetic-rules
                 %pair-rules
                 %scheme-list-rules
-                %call/cc-rules))))
+                %call/cc-rules
+                %order-rules))))

@@ -72,9 +72,13 @@
                                      (cond ((assq 'file-name config) => cadr)
                                            (else "Unkown position"))))
                            ((eq? execution-type 'program)
-                            (set-car! res-box
-                                      (cons `(,code ,suggested-code)
-                                            (car res-box))))
+                            (let ((position
+                                    (cond ((red-paren/source-info code))
+                                          ((assq 'file-name config) => cadr)
+                                          (else "Unkown position"))))
+                               (set-car! res-box
+                                         (cons `(,code ,suggested-code ,position)
+                                               (car res-box)))))
                            (else))
                          (for-each
                            (lambda (_code)
@@ -90,5 +94,5 @@
         (let* ((output-type (%config-ref 'execution-type config 'command-line))
                (res-box (list '())))
            (%lint code rules output-type res-box config)
-           (if (eq? output-type 'command-line)
+           (if (eq? output-type 'program)
              (car res-box))))))
