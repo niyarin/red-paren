@@ -5,7 +5,7 @@
         (scheme write) (color-paren red-paren)
         (color-paren red-paren default-rules))
 
-(define (main)
+(define (main-script)
   (let ((targets (cdr (command-line))))
     (for-each
       (lambda (file-name)
@@ -17,7 +17,9 @@
                            (if (eof-object? input)
                              (reverse res)
                              (loop (read input-port) (cons input res))))))
-              (red-paren/lint code red-paren/default-rules)))))
+              (red-paren/lint code
+                              red-paren/default-rules
+                              `(file-name ,file-name))))))
       targets)))
 
-(main)
+(main-script)

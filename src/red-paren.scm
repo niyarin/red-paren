@@ -1,9 +1,12 @@
 (include "./lib/rules-plus.scm")
 (include "./rules.scm")
+(include "./source-info.scm")
 
 (define-library (color-paren red-paren)
    (import (scheme base) (scheme cxr) (scheme write)
-           (niyarin rules+) (color-paren red-paren default-rules))
+           (niyarin rules+)
+           (color-paren red-paren default-rules)
+           (color-paren red-paren source-info))
    (export red-paren/lint)
    (begin
       (define *limit-recursion 10000)
@@ -25,12 +28,17 @@
                (else
                  (loop (cdr rules))))))
 
-      (define (%assert from to comment lib)
-        (display "----------")(newline)
-        (unless (null? lib) (display lib)(display " : "))
-        (display comment)(newline)(newline)
-        (display "   ")(write from)(newline)
-        (display "=> ")(write to)(newline)(newline))
+      (define (%assert from to comment lib file-name)
+        (let ((position (red-paren/source-info from)))
+           (display "----------")(newline)
+           (if position
+             (begin (display (car position))(display " ")
+                    (display (cadr position))(newline))
+             (begin (display file-name)(newline)))
+           (unless (null? lib) (display lib)(display " : "))
+           (display comment)(newline)(newline)
+           (display "   ")(write from)(newline)
+           (display "=> ")(write to)(newline)(newline)))
 
       (define (%config-ref key config default)
         (cond
@@ -60,7 +68,9 @@
                          (cond
                            ((eq? execution-type 'command-line)
                             (%assert code suggested-code
-                                     (cadr suggestion) (caddr suggestion)))
+                                     (cadr suggestion) (caddr suggestion)
+                                     (cond ((assq 'file-name config) => cadr)
+                                           (else "Unkown position"))))
                            ((eq? execution-type 'program)
                             (set-car! res-box
                                       (cons `(,code ,suggested-code)
