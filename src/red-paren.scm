@@ -60,7 +60,7 @@
       (define (%lint code rules execution-type res-box config)
           (let loop ((code code))
               (cond
-                ((not (list? code)))
+                ((or (not (list? code)) (null? code)))
                 ((eq? (car code) 'quote))
                 ((%lint1-loop code rules)
                  => (lambda (suggestion)
