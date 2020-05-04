@@ -32,7 +32,7 @@
 
       (define %scheme-list-rules
         `(((cons lambda) (lambda (a b) (cons b a)) xcons "" (scheme list))
-          ((cons) (cons a (cons b c)) (cons* x y z) "" (scheme list))
+          ((cons) (cons a (cons b c)) (cons* a b c) "" (scheme list))
           ((values car cdr) (values (car x) (cdr x)) (car+cdr x) "" (scheme list))
           ((list car cadr) (list (car x) (cadr x)) (take 2 x) "" (scheme list))
           ((list car cadr caddr) (list (car x) (cadr x) (caddr x)) (take 3 x) "" (scheme list))
