@@ -28,7 +28,10 @@
         `(((car) (car (car x)) (caar x))
           ((cdr) (cdr (cdr x)) (cddr x))
           ((car cdr) (car (cdr x)) (cadr x))
-          ((car cdr) (cdr (car x)) (cdar x))))
+          ((car cdr) (cdr (car x)) (cdar x))
+          ((append list) (append (list x) ls) (cons x ls))
+          ((append list) (append (list x) ls1 ls2 ...)
+                         (cons x (append ls1 ls2 ...)))))
 
       (define %scheme-list-rules
         `(((cons lambda) (lambda (a b) (cons b a)) xcons "" (scheme list))
