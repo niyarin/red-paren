@@ -3,8 +3,8 @@
    (export red-paren/default-rules)
    (begin
       (define %assoc-rules
-        `(((assv) (assv (quote ,symbol?) x) (assq (quote ,symbol?) x))
-          ((assoc) (assoc (quote ,symbol?) x) (assq (quote ,symbol?) x))))
+        `(((assv quote) (assv (quote ,symbol?) x) (assq (quote ,symbol?) x))
+          ((assoc quote) (assoc (quote ,symbol?) x) (assq (quote ,symbol?) x))))
 
       (define %eq-rules
         `(((eqv?) (eqv? (quote ,symbol?) x) (eq? (quote ,symbol? x)))
