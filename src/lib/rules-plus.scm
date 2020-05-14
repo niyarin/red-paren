@@ -50,6 +50,8 @@
                                               _break)))
                                (loop rule (cdr input) _break (+ nest-cnt 1) new-res))))
                   (loop (cddr rule) input break 0 res)))
+             ((not (pair? input))
+              (break #f))
              (else (loop (cdr rule)
                          (cdr input)
                          break
