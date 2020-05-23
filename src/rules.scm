@@ -52,7 +52,7 @@
           ((apply append) (apply append list-of-list)
                           (concatenate list-of-list)
                           "" (scheme list))
-          ((filter lambda not ) (filter (lambda (x) (not (pred x)) body) ls)
+          ((filter lambda not ) (filter (lambda (x) (not (pred x))) ls)
                                 (remove pred ls)
                                 "" (scheme list))
           ((append reverse) (append (reverse rev-head) tail) (append-reverse rev-head tail)
