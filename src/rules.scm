@@ -13,7 +13,9 @@
       (define %control-rules
         `(((if) (if test true-expression) (when test true-expression))
           ((when not) (when (not test) expressions ...)
-                      (unless test expressions ...))))
+                      (unless test expressions ...))
+          ((cond =>) (cond ptn1 ... (test => (lambda (x) x)) ptn2 ...)
+                     (cond ptn1 ... (test) ptn2 ...))))
 
       (define %arithmetic-rules
         `(((=) (= x 0) (zero? x))
