@@ -70,6 +70,10 @@
                   "Execution order is unspecified(\"R7RS 4.1.3.  Procedure calls\")"
                   '())))
 
+      (define %delay-rules
+        '(((delay force) (delay (force expression))
+                         (delay-force expression))))
+
       (define red-paren/default-rules
         (append %assoc-rules
                 %control-rules
@@ -77,4 +81,5 @@
                 %pair-rules
                 %scheme-list-rules
                 %call/cc-rules
-                %order-rules))))
+                %order-rules
+                %delay-rules))))
