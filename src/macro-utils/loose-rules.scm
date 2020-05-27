@@ -1,5 +1,5 @@
 (define-library (niyarin loose-rules)
-   (import (scheme base)(scheme list)(scheme case-lambda))
+   (import (scheme base)(scheme list)(scheme case-lambda) (scheme write))
    (export loose-rules/match loose-rules/expand loose-rules/match-expand)
    (begin
       (define (%parse-list ellipsis-symbol ls)
@@ -96,6 +96,7 @@
                (tail (cadr (assq 'tail parsed-list)))
                (last-cdr (cadr (assq 'last-cdr parsed-list)))
                (ellipsis (cadr (assq 'ellipsis parsed-list))))
+
            (let loop ((type type)
                       (input (car _input))
                       (head head)
@@ -152,7 +153,7 @@
           ((equal? rule input) '())
           (else (break #f))))
 
-   (define (%search-symbols obj)
+   (define (%search-symbols obj excluded-list)
      (let* ((ltop (list #f))
             (tconc (cons ltop ltop)))
        (let loop ((obj obj))
@@ -162,7 +163,8 @@
             (loop (cdr obj)))
            ((vector? obj)
             (vector-for-each loop obj))
-           ((symbol? obj)
+           ((and (symbol? obj)
+                 (not (memq obj excluded-list)))
             (set-cdr! (cdr tconc)
                       (list obj))
             (set-cdr! tconc
@@ -221,7 +223,7 @@
       (define (%match-boot ellipsis literal rule input)
         (call/cc
           (lambda (break)
-            (let* ((rule-symbols (%search-symbols rule))
+            (let* ((rule-symbols (%search-symbols rule (cons ellipsis literal)))
                    (duplicates-rules-symbols (%calc-duplicates rule-symbols literal ellipsis)))
                (let-values (((new-rule duplicates-alist) (%new-rule&duplicates-alist rule rule-symbols duplicates-rules-symbols)))
                   (let* ((match-res (%match ellipsis literal new-rule input break))
@@ -240,8 +242,10 @@
                                   duplicates-alist)))
                      (if (memq #f dres)
                        #f
-                       (append not-duplicate-res
-                               dres))))))))
+                       (%alists-distinct 
+                               not-duplicate-res
+                               dres
+                               (map (lambda (x) (list x)) rule-symbols)))))))))
 
       (define (%tree-ref tree refs break . debug-info)
          (let loop ((refs refs)
