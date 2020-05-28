@@ -1,0 +1,27 @@
+(define-library (color-paren red-paren nearest-code)
+   (import (scheme base))
+   (export red-paren-nearest-code/calc-point)
+   (begin
+      (define (%depth code)
+        (let loop ((code code)
+                   (depth 0))
+           (if (list? code)
+             (apply max (map (lambda (x) (loop x (+ depth 1)))
+                             code))
+             depth)))
+
+      (define (%simple-diff-point code original)
+          (let loop ((l1 (if (list? code) code (list code)))
+                     (l2 original)
+                     (res 0))
+            (cond
+              ((or (null? l2) (null? l1)) res)
+              ((member (car l2) l1)
+               => (lambda (ls)
+                    (loop ls (cdr l2) (+ res 1))))
+              (else (loop (cdr l1) (cdr l2) res)))))
+
+      (define (red-paren-nearest-code/calc-point code original)
+        (list (%simple-diff-point code original)
+              (- (%depth code))
+              (- (length code))))))
