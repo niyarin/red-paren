@@ -43,7 +43,7 @@
                          (cons x (append ls1 ls2 ...)))))
 
       (define %scheme-list-rules
-        `(((cons lambda) (lambda (a b) (cons b a)) xcons "" (scheme list))
+        `(;((cons lambda) (lambda (a b) (cons b a)) xcons "" (scheme list))
           ((cons) (cons a (cons b c)) (cons* a b c) "" (scheme list))
           ((cons cons*) (cons* x ... (cons b c)) (cons* x ... b c) "" (scheme list))
           ((cons cons*) (cons* a b) (cons a b) "" (scheme list))
