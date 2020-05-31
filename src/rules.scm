@@ -1,5 +1,5 @@
 (define-library (color-paren red-paren default-rules)
-   (import (scheme base))
+   (import (scheme base) (scheme cxr))
    (export red-paren/default-rules)
    (begin
       (define %assoc-rules
@@ -11,11 +11,18 @@
           ((equal?) (equal? (quote ,symbol?) x) (eq? (quote ,symbol? x)))))
 
       (define %control-rules
-        `(((if) (if test true-expression) (when test true-expression))
-          ((when not) (when (not test) expressions ...)
-                      (unless test expressions ...))
-          ((cond =>) (cond ptn1 ... (test => (lambda (x) x)) ptn2 ...)
-                     (cond ptn1 ... (test) ptn2 ...))))
+        (let ((identity-lambda?
+                (lambda (x)
+                  (and (list? x)
+                       (= (length x) 3)
+                       (list? (cadr x))
+                       (= (length (cadr x)) 1)
+                       (eq? (caadr x) (caddr x))))))
+           `(((if) (if test true-expression) (when test true-expression))
+             ((when not) (when (not test) expressions ...)
+                         (unless test expressions ...))
+             ((cond =>) (cond ptn1 ... (test => ,identity-lambda?) ptn2 ...)
+                        (cond ptn1 ... (test) ptn2 ...)))))
 
       (define %arithmetic-rules
         `(((=) (= x 0) (zero? x))
