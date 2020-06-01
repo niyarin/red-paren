@@ -45,6 +45,7 @@
           ((list car cadr caddr) (list (car x) (cadr x) (caddr x)) (take 3 x) "" (scheme list))
           ((list car cadr caddr cadddr) (list (car x) (cadr x) (caddr x) (cadddr x)) (take 4 x) "" (scheme list))
           ((filter map lambda) (filter (lambda (x) x) (map f ls ...)) (filter-map f ls ...) "" (scheme list))
+          ((filter lambda) (filter (lambda (x) (pred? x)) some-list) (filter pred? some-list))
           ((apply map list) (apply map list ls ...) (zip ls ...) "" (scheme list))
           ((not pair?) (not (pair? x)) (not-pair? x) "" (scheme list))
           ((apply append map) (apply append (map f ls ...))
