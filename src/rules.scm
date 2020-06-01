@@ -42,6 +42,13 @@
           ((append list) (append (list x) ls1 ls2 ...)
                          (cons x (append ls1 ls2 ...)))))
 
+      (define %verbose-define-rules
+        `(((define car) (define (foo x) (car x)) (define foo car))
+          ((define cdr) (define (foo x) (cdr x)) (define foo cdr))
+          ((define cadr) (define (foo x) (cadr x)) (define foo cadr))
+          ((define caddr) (define (foo x) (caddr x)) (define foo caddr))))
+
+
       (define %scheme-list-rules
         `(((cons lambda) (lambda (a b) (cons b a)) xcons "" (scheme list))
           ((cons) (cons a (cons b c)) (cons* a b c) "" (scheme list))
@@ -91,4 +98,5 @@
                 %scheme-list-rules
                 %call/cc-rules
                 %order-rules
-                %delay-rules))))
+                %delay-rules
+                %verbose-define-rules))))
