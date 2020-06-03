@@ -60,8 +60,8 @@
       (define (%lint code rules execution-type res-box config)
           (let loop ((code code))
               (cond
-                ((or (not (list? code)) (null? code)))
-                ((eq? (car code) 'quote))
+                ((or (not (list? code)) (null? code)) code)
+                ((eq? (car code) 'quote) code)
                 ((%lint1-loop code rules)
                  => (lambda (suggestion)
                       (let ((suggested-code (car suggestion)))
@@ -80,10 +80,16 @@
                                          (cons `(,code ,suggested-code ,position)
                                                (car res-box)))))
                            (else))
-                         (for-each
-                           (lambda (_code)
-                             (loop _code))
-                           code))))
+                         (cond
+                           ((and (eq? execution-type 'code)
+                                 (list? suggested-code))
+                              (map (lambda (_code) (loop _code))
+                                   suggested-code))
+                           ((eq? execution-type 'code) suggested-code)
+                              (for-each (lambda (_code) (loop _code))
+                                        code)))))
+                ((eq? execution-type 'code)
+                 (map (lambda (_code) (loop _code)) code))
                 (else
                   (for-each
                     (lambda (_code)
@@ -92,7 +98,9 @@
 
       (define (red-paren/lint code rules . config)
         (let* ((output-type (%config-ref 'execution-type config 'command-line))
-               (res-box (list '())))
-           (%lint code rules output-type res-box config)
-           (if (eq? output-type 'program)
-             (car res-box))))))
+               (res-box (list '()))
+               (res (%lint code rules output-type res-box config)))
+           (cond
+             ((eq? output-type 'program) (car res-box))
+             ((eq? output-type 'code) res)
+             (else))))))
