@@ -54,6 +54,7 @@
           ((cddddr cadr) (cadr (cddddr x)) (list-ref x 5))
           ((cddddr caddr) (caddr (cddddr x)) (list-ref x 6))
           ((append list) (append (list x) ls) (cons x ls))
+          ((append list) (append (list x ...) y) (cons* x ... y))
           ((append list) (append (list x) ls1 ls2 ...)
                          (cons x (append ls1 ls2 ...)))))
 
