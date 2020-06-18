@@ -15,7 +15,22 @@
           ((when not) (when (not test) expressions ...)
                       (unless test expressions ...))
           ((cond =>) (cond ptn1 ... (test => (lambda (x) x)) ptn2 ...)
-                     (cond ptn1 ... (test) ptn2 ...))))
+                     (cond ptn1 ... (test) ptn2 ...))
+          ((and) (and x ... (and  y ...) z ...)
+                 (and x ... y ... z ...))
+          ((if) (if v w (if x y z))
+                (cond
+                  (v w)
+                  (x y)
+                  (else z)))
+          ((cond)
+            (cond head ...
+                  (x exp1)
+                  (y exp1)
+                  z ...)
+            (cond head ...
+                  ((and x y) exp1)
+                   z ...))))
 
       (define %arithmetic-rules
         `(((=) (= x 0) (zero? x))
@@ -55,9 +70,9 @@
           ((cons cons*) (cons* x ... (cons b c)) (cons* x ... b c) "" (scheme list))
           ((cons cons*) (cons* a b) (cons a b) "" (scheme list))
           ((values car cdr) (values (car x) (cdr x)) (car+cdr x) "" (scheme list))
-          ((list car cadr) (list (car x) (cadr x)) (take 2 x) "" (scheme list))
-          ((list car cadr caddr) (list (car x) (cadr x) (caddr x)) (take 3 x) "" (scheme list))
-          ((list car cadr caddr cadddr) (list (car x) (cadr x) (caddr x) (cadddr x)) (take 4 x) "" (scheme list))
+          ((list car cadr) (list (car x) (cadr x)) (take x 2) "" (scheme list))
+          ((list car cadr caddr) (list (car x) (cadr x) (caddr x)) (take x 3) "" (scheme list))
+          ((list car cadr caddr cadddr) (list (car x) (cadr x) (caddr x) (cadddr x)) (take x 4) "" (scheme list))
           ((filter map lambda) (filter (lambda (x) x) (map f ls ...)) (filter-map f ls ...) "" (scheme list))
           ((filter lambda) (filter (lambda (x) (pred? x)) some-list) (filter pred? some-list))
           ((apply map list) (apply map list ls ...) (zip ls ...) "" (scheme list))
@@ -90,6 +105,18 @@
         '(((delay force) (delay (force expression))
                          (delay-force expression))))
 
+      (define %cond->case-rules
+        (let ((symbol1? (lambda (x) (and (symbol? x) 1)))
+              (symbol2? (lambda (x) (and (symbol? x) 2)))
+              (symbol3? (lambda (x) (and (symbol? x) 3))))
+           `(((cond eq? quote else) (cond ((eq? x (quote ,symbol1?)) expression1)
+                                          ((eq? x (quote ,symbol2?)) expression2)
+                                          (else expression3))
+                                    (case x
+                                        ((,symbol1?) expression1)
+                                        ((,symbol2?) expression2)
+                                        (else expression3))))))
+
       (define red-paren/default-rules
         (append %assoc-rules
                 %control-rules
@@ -99,4 +126,5 @@
                 %call/cc-rules
                 %order-rules
                 %delay-rules
-                %verbose-define-rules))))
+                %verbose-define-rules
+                %cond->case-rules))))
