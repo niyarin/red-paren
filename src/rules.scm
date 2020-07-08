@@ -23,14 +23,17 @@
                   (v w)
                   (x y)
                   (else z)))
-          ((cond)
+          ((cond else)
             (cond head ...
                   (x exp1)
                   (y exp1)
-                  z ...)
+                  z ...
+                  (else else-exp ...)
+                  )
             (cond head ...
-                  ((and x y) exp1)
-                   z ...))))
+                  ((or x y) exp1)
+                   z ...
+                   (else else-exp ...)))))
 
       (define %arithmetic-rules
         `(((=) (= x 0) (zero? x))
