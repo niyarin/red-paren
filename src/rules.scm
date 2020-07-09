@@ -18,6 +18,8 @@
                      (cond ptn1 ... (test) ptn2 ...))
           ((and) (and x ... (and  y ...) z ...)
                  (and x ... y ... z ...))
+          ((or) (or a (or b ... ))
+                (or a b ... ))
           ((if) (if v w (if x y z))
                 (cond
                   (v w)
@@ -28,12 +30,17 @@
                   (x exp1)
                   (y exp1)
                   z ...
-                  (else else-exp ...)
-                  )
+                  (else else-exp ...))
             (cond head ...
                   ((or x y) exp1)
                    z ...
-                   (else else-exp ...)))))
+                   (else else-exp ...)))
+          ((cond else)
+           (cond head ...
+                 (test exp1 ... )
+                 (else exp1 ... ))
+           (cond head ...
+                 (else test exp1 ...)))))
 
       (define %arithmetic-rules
         `(((=) (= x 0) (zero? x))
@@ -79,7 +86,6 @@
           ((list car cadr caddr cadddr) (list (car x) (cadr x) (caddr x) (cadddr x)) (take x 4) "" (scheme list))
           ((filter map lambda) (filter (lambda (x) x) (map f ls ...)) (filter-map f ls ...) "" (scheme list))
           ((filter lambda) (filter (lambda (x) (pred? x)) some-list) (filter pred? some-list))
-          ((apply map list) (apply map list ls ...) (zip ls ...) "" (scheme list))
           ((not pair?) (not (pair? x)) (not-pair? x) "" (scheme list))
           ((apply append map) (apply append (map f ls ...))
                               (append-map f ls ...)
@@ -91,7 +97,8 @@
                                 (remove pred ls)
                                 "" (scheme list))
           ((append reverse) (append (reverse rev-head) tail) (append-reverse rev-head tail)
-                            "" (scheme list))))
+                            "" (scheme list))
+          ((map list) (map list ls) (zip ls) "" (scheme list))))
 
 
       (define %call/cc-rules
