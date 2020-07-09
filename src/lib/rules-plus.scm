@@ -1,5 +1,5 @@
 (define-library (niyarin rules+)
-   (import (scheme base)(scheme case-lambda) (scheme list))
+   (import (scheme base)(scheme case-lambda) (scheme list) (scheme write))
    (export rules+/match rules+/expand rules+/match-expand)
    (begin
       (define (%alists-distinct . args)
@@ -181,13 +181,19 @@
                                                          (memq (car apair) generated-symbols))
                                                        match-res))
                             (dres
-                                (map (lambda (apair)
-                                       (let ((dls (map (lambda (sym)
-                                                         (cdr (assq sym match-res)))
-                                                       (cdr apair))))
-                                          (if (not (null? (remove (lambda (x) (equal? x (car dls))) dls)))
+                                (map (lambda (sym-duplicate-sym-list)
+                                       (let* ((dls-chk (map (lambda (sym)
+                                                              (assq sym
+                                                                    match-res))
+                                                       (cdr sym-duplicate-sym-list)))
+                                              (dls (if (find (lambda (x) x) dls-chk)
+                                                     #f
+                                                     (map cdr dls-chk))))
+                                          (if (or (not dls)
+                                                  (not (null? (remove (lambda (x) (equal? x (car dls))) dls))))
                                             #f
-                                            (cons (car apair) (car dls)))))
+                                            (cons (car sym-duplicate-sym-list)
+                                                  (car dls)))))
                                      duplicates-alist)))
                         (if (memq #f dres)
                           #f
