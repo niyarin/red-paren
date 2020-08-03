@@ -5,8 +5,15 @@
         (scheme write) (color-paren red-paren)
         (color-paren red-paren default-rules))
 
+(define (display-about-red-paren)
+  (write-string
+    "Usage: rparen file-name ..."
+    (current-error-port)))
+
 (define (main-script)
   (let ((targets (cdr (command-line))))
+    (when (null? targets)
+      (display-about-red-paren))
     (for-each
       (lambda (file-name)
         (call-with-input-file
