@@ -1,5 +1,9 @@
 (define-library (niyarin rules+)
-   (import (scheme base)(scheme case-lambda) (scheme list) (scheme write))
+   (cond-expand
+     (chicken-5 (import (scheme base)(scheme case-lambda) (srfi 1) (scheme write)))
+     ((scheme list) (import (scheme base)(scheme case-lambda) (scheme list) (scheme write)))
+     (else (syntax-error "Sorry")))
+
    (export rules+/match rules+/expand rules+/match-expand)
    (begin
       (define (%alists-distinct . args)
