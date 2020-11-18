@@ -25,6 +25,7 @@
                   (v w)
                   (x y)
                   (else z)))
+          ((if) (if test true #f) (and test true))
           ((cond else)
             (cond head ...
                   (x exp1)
