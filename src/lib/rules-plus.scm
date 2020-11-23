@@ -1,7 +1,8 @@
 (define-library (niyarin rules+)
    (cond-expand
-     (chicken-5 (import (scheme base)(scheme case-lambda) (srfi 1) (scheme write)))
-     ((scheme list) (import (scheme base)(scheme case-lambda) (scheme list) (scheme write)))
+     ((library (scheme list)) (import (scheme base)(scheme case-lambda) (scheme list) (scheme write)))
+     ((library (srfi 1)) (import (scheme base)(scheme case-lambda) (srfi 1) (scheme write)))
+     (chicken (import (scheme base)(scheme case-lambda) (srfi 1) (scheme write)))
      (else (syntax-error "Sorry")))
 
    (export rules+/match rules+/expand rules+/match-expand)
@@ -184,21 +185,18 @@
                             (not-duplicate-res (remove (lambda (apair)
                                                          (memq (car apair) generated-symbols))
                                                        match-res))
-                            (dres
-                                (map (lambda (sym-duplicate-sym-list)
-                                       (let* ((dls-chk (map (lambda (sym)
-                                                              (assq sym
-                                                                    match-res))
-                                                       (cdr sym-duplicate-sym-list)))
-                                              (dls (if (find (lambda (x) x) dls-chk)
-                                                     #f
-                                                     (map cdr dls-chk))))
-                                          (if (or (not dls)
-                                                  (not (null? (remove (lambda (x) (equal? x (car dls))) dls))))
-                                            #f
-                                            (cons (car sym-duplicate-sym-list)
-                                                  (car dls)))))
-                                     duplicates-alist)))
+                            (dres (map (lambda (sym-duplicate-sym-list)
+                                           (let* ((target-alist
+                                                    (map (lambda (sym) (assq sym match-res)) (cdr sym-duplicate-sym-list)))
+                                                  (target-values
+                                                    (and (every (lambda (x) x) target-alist)
+                                                         (map cdr target-alist))))
+                                             (if (and target-values
+                                                      (every (lambda (x) (equal? (car target-values) x))
+                                                             (cdr target-values)))
+                                               (cons (car sym-duplicate-sym-list) (car target-values))
+                                               #f)))
+                                         duplicates-alist)))
                         (if (memq #f dres)
                           #f
                           (%alists-distinct

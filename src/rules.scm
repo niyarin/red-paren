@@ -10,6 +10,10 @@
         `(((eqv?) (eqv? (quote ,symbol?) x) (eq? (quote ,symbol? x)))
           ((equal?) (equal? (quote ,symbol?) x) (eq? (quote ,symbol? x)))))
 
+      (define %let-rules
+        `(((let) (let ((bind v)) bind)
+                 bind)))
+
       (define %control-rules
         `(((if) (if test true-expression) (when test true-expression))
           ((when not) (when (not test) expressions ...)
@@ -132,6 +136,7 @@
       (define red-paren/default-rules
         (append %assoc-rules
                 %control-rules
+                %let-rules
                 %arithmetic-rules
                 %pair-rules
                 %scheme-list-rules
