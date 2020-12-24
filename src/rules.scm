@@ -14,6 +14,9 @@
         `(((let) (let ((bind v)) bind)
                  bind)))
 
+      (define %ientity-rules
+        `(((lambda) (lambda (x) x) values)))
+
       (define %control-rules
         `(((if) (if test true-expression) (when test true-expression))
           ((when not) (when (not test) expressions ...)
@@ -141,6 +144,7 @@
                 %pair-rules
                 %scheme-list-rules
                 %call/cc-rules
+                %ientity-rules
                 %order-rules
                 %delay-rules
                 %verbose-define-rules
