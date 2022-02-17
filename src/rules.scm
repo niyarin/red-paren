@@ -12,7 +12,7 @@
 
       (define %let-rules
         `(((let) (let ((bind v)) bind)
-                 bind)))
+                 v)))
 
       (define %ientity-rules
         `(((lambda) (lambda (x) x) values)))
