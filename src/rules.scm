@@ -82,7 +82,6 @@
           ((define cadr) (define (foo x) (cadr x)) (define foo cadr))
           ((define caddr) (define (foo x) (caddr x)) (define foo caddr))))
 
-
       (define %scheme-list-rules
         `(((cons lambda) (lambda (a b) (cons b a)) xcons "" (scheme list))
           ((cons) (cons a (cons b c)) (cons* a b c) "" (scheme list))
@@ -136,6 +135,9 @@
                                         ((,symbol2?) expression2)
                                         (else expression3))))))
 
+      (define %redundancy-bool
+         '(((not eq?) (not (eq? x #f)) x)))
+
       (define red-paren/default-rules
         (append %assoc-rules
                 %control-rules
@@ -148,4 +150,5 @@
                 %order-rules
                 %delay-rules
                 %verbose-define-rules
+                %redundancy-bool
                 %cond->case-rules))))
