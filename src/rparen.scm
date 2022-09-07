@@ -38,9 +38,8 @@
 
 (define (read-flisp-code input-port)
   (let* ((str (read-all input-port))
-         (replaced (replace-str str
-                                ",."
-                                ",@")));;WIP
+         (replaced (replace-str (replace-str str ",." ",@");;WIP
+                                "#\\linefeed" "#\\newline")));;WIP
     (read-scm-code* (open-input-string replaced))))
 
 
