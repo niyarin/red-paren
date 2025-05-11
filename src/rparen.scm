@@ -1,5 +1,4 @@
-(include "./red-paren.scm"
-         "./red-paren.scm");TODO:fix same libname
+(include "./red-paren.scm")
 
 (import (scheme base) (scheme read) (scheme file) (scheme process-context)
         (scheme write) (color-paren red-paren)

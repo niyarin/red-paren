@@ -138,6 +138,15 @@
       (define %redundancy-bool
          '(((not eq?) (not (eq? x #f)) x)))
 
+      (define %string-append-rules
+        `(((string-append) (string-append (string-append val1 ...) val2 ...)
+                           (string-append val1 ... val2 ...))))
+
+      (define %remove-duplicate-rules
+        `(((set->list apply set equal-comparator)
+           (set->list (apply set equal-comparator ls))
+           (remove-duplicate ls equal?))))
+
       (define red-paren/default-rules
         (append %assoc-rules
                 %control-rules
@@ -151,4 +160,6 @@
                 %delay-rules
                 %verbose-define-rules
                 %redundancy-bool
-                %cond->case-rules))))
+                %cond->case-rules
+                %string-append-rules
+                %remove-duplicate-rules))))
